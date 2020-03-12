@@ -2,7 +2,6 @@ package dox4.sparrow;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -27,6 +26,7 @@ public class HelloSocket {
                 System.out.println(request.toString());
                 Response response = new Response(request, socket.getOutputStream());
                 response.send();
+                socket.close();
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * @author chengzj
+ * @author dox4
  * @date 2020/3/12
  * @description HTTP response class
  */
@@ -14,6 +14,7 @@ public class Response {
     private OutputStream output;
     final static String NOT_FOUND = "404.html";
     final static int BUFFER_SIZE = 1024;
+    final static String ROOT = "/";
 
     Response(Request request, OutputStream output) {
         this.request = request;
@@ -22,7 +23,7 @@ public class Response {
 
     public void send() {
         String uri = request.getUri();
-        if (uri.startsWith("/")) {
+        if (uri.startsWith(ROOT)) {
             uri = uri.substring(1);
         }
         byte[] buffer = new byte[BUFFER_SIZE];
@@ -30,16 +31,17 @@ public class Response {
         InputStream is = getClass().getClassLoader().getResourceAsStream(uri);
         if (is == null) {
             is = getClass().getClassLoader().getResourceAsStream(NOT_FOUND);
-            msg = "HTTP1.1 404 File Not Found\r\n";
+            msg = "HTTP/1.1 404 File Not Found\r\n";
         } else {
             msg = "HTTP/1.1 200 OK\r\n";
         }
 
         msg += "Content-Type: text/html\r\n" +
                 "Content-Length: ";
-        int length;
 
+        int length;
         StringBuilder sb = new StringBuilder();
+
         try {
             assert is != null;
             while ((length = is.read(buffer)) != -1) {

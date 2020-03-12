@@ -12,7 +12,6 @@ import java.util.Map;
  */
 public class Request {
     static final int BUFFER_SIZE = 1024;
-    static final char SPACE = ' ';
 
     private String method;
     private String uri;
@@ -31,15 +30,8 @@ public class Request {
         try {
             length = is.read(buffer);
             for (int i = 0; i < length; i++) {
-                sb.append((char)buffer[i]);
+                sb.append((char) buffer[i]);
             }
-//            length = is.read(buffer);
-//            System.out.println(length);
-//            while ((length = is.read(buffer)) != 0) {
-//                for (int i = 0; i < length; i++) {
-//                    sb.append((char) buffer[i]);
-//                }
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,20 +53,8 @@ public class Request {
         }
     }
 
-    public String getMethod() {
-        return method;
-    }
-
     public String getUri() {
         return uri;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
     }
 
     public String getRawRequest() {

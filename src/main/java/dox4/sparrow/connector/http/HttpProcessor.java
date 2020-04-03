@@ -96,7 +96,8 @@ public class HttpProcessor {
             request.setRequestURI(uri);
             String protocol = sis.readRequestProtocol();
             request.setProtocol(protocol);
-            parseHeaders(sis);
+            Map<String, String> headers = sis.readHeaders();
+            request.addHeaders(headers);
 
             if (request.getRequestURI().startsWith("/servlet/")) {
                 ServletProcessor processor = new ServletProcessor();
@@ -191,10 +192,11 @@ public class HttpProcessor {
         return normalized;
 
     }
-
-    private void parseHeaders(SocketInputStream sis) {
-        Map<String, Object> headers = sis.readHeaders();
-    }
+//
+//    private void parseHeaders(SocketInputStream sis) throws IOException {
+//        Map<String, Object> headers = sis.readHeaders();
+//
+//    }
 
 //    private void parseRequestLine(SocketInputStream sis, OutputStream os) throws IOException {
 //        String method = sis.readRequestMethod();

@@ -18,8 +18,8 @@ import java.util.*;
 public class HttpRequest implements HttpServletRequest {
     private final SocketInputStream input;
 
-    protected Map<String, Object> headers = new HashMap<>();
-    protected List<String> cookies = new ArrayList<>();
+    protected Map<String, String> headers = new HashMap<>();
+    //    protected List<String> cookies = new ArrayList<>();
     protected ParameterMap parameters = null;
     protected String method;
     protected String requestUri;
@@ -27,6 +27,10 @@ public class HttpRequest implements HttpServletRequest {
     private String queryString;
     private String sessionId;
     private boolean requestedSessionURL;
+    private int contentLength = -1;
+    private String contentType = null;
+    private Cookie[] cookies = new Cookie[0];
+
 
     public HttpRequest(SocketInputStream sis) {
         this.input = sis;
@@ -39,7 +43,27 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public Cookie[] getCookies() {
-        return new Cookie[0];
+        if (cookies.length != 0) {
+            return cookies;
+        }
+        if (headers == null || headers.size() == 0) {
+            return cookies;
+        }
+        String cookie = headers.get("Cookie");
+        if (cookie.length() == 0) {
+            return cookies;
+        }
+        List<Cookie> cookiesList = new ArrayList<>();
+        String[] pairs = cookie.split(";");
+        for (String pair : pairs) {
+            int indexOfEqual = pair.indexOf("=");
+            // assume every cookie is well formatted
+            String name = pair.substring(0, indexOfEqual);
+            String value = pair.substring(indexOfEqual + 1);
+            cookiesList.add(new Cookie(name, value));
+        }
+        cookies = (Cookie[]) cookiesList.toArray();
+        return cookies;
     }
 
     @Override
@@ -49,7 +73,9 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public String getHeader(String name) {
-        return null;
+        return headers != null ?
+                headers.get(name)
+                : null;
     }
 
     @Override
@@ -70,14 +96,6 @@ public class HttpRequest implements HttpServletRequest {
     @Override
     public String getMethod() {
         return method;
-    }
-
-    public void setRequestURI(String requestUri) {
-        this.requestUri = requestUri;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
     }
 
     public void setMethod(String method) {
@@ -104,6 +122,10 @@ public class HttpRequest implements HttpServletRequest {
         return queryString;
     }
 
+    public void setQueryString(String queryString) {
+        this.queryString = queryString;
+    }
+
     @Override
     public String getRemoteUser() {
         return null;
@@ -124,9 +146,17 @@ public class HttpRequest implements HttpServletRequest {
         return sessionId;
     }
 
+    public void setRequestedSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
     @Override
     public String getRequestURI() {
         return requestUri;
+    }
+
+    public void setRequestURI(String requestUri) {
+        this.requestUri = requestUri;
     }
 
     @Override
@@ -226,17 +256,31 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public int getContentLength() {
-        return 0;
+        if (contentLength != -1) {
+            return contentLength;
+        }
+        if (headers == null || headers.size() == 0)
+            return 0;
+        String value = headers.get("Content-Length");
+        contentLength = Integer.parseInt(value);
+        return contentLength;
     }
 
     @Override
     public long getContentLengthLong() {
-        return 0;
+        return getContentLength();
     }
 
     @Override
     public String getContentType() {
-        return null;
+        if (contentType != null) {
+            return contentType;
+        }
+        if (headers == null || headers.size() == 1) {
+            return null;
+        }
+        contentType = headers.get("Content-Type");
+        return contentType;
     }
 
     @Override
@@ -267,6 +311,10 @@ public class HttpRequest implements HttpServletRequest {
     @Override
     public String getProtocol() {
         return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     @Override
@@ -389,15 +437,11 @@ public class HttpRequest implements HttpServletRequest {
         return null;
     }
 
-    public void setQueryString(String queryString) {
-        this.queryString = queryString;
-    }
-
-    public void setRequestedSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
     public void setRequestedSessionURL(boolean b) {
         this.requestedSessionURL = b;
+    }
+
+    public void addHeaders(Map<String, String> headers) {
+        this.headers.putAll(headers);
     }
 }

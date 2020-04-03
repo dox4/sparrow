@@ -1,26 +1,18 @@
-package dox4.sparrow;
+package dox4.sparrow.connector.http;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Locale;
 
 /**
- * @author dox4
- * @date 2020/3/12
- * @description HTTP response class
+ * @date 2020/4/2
+ * @description Http 响应外观类
  */
-public class SimpleResponse implements HttpServletResponse {
-    private OutputStream output;
-
-    SimpleResponse(OutputStream output) {
-        this.output = output;
-    }
-
+public class HttpResponseFacade implements HttpServletResponse {
     @Override
     public void addCookie(Cookie cookie) {
 
@@ -53,17 +45,17 @@ public class SimpleResponse implements HttpServletResponse {
 
     @Override
     public void sendError(int sc, String msg) throws IOException {
-        throw new IOException();
+
     }
 
     @Override
     public void sendError(int sc) throws IOException {
-        throw new IOException();
+
     }
 
     @Override
     public void sendRedirect(String location) throws IOException {
-        throw new IOException();
+
     }
 
     @Override
@@ -138,15 +130,12 @@ public class SimpleResponse implements HttpServletResponse {
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        throw new IOException();
+        return null;
     }
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        if (output == null) {
-            throw new IOException();
-        }
-        return new PrintWriter(output);
+        return null;
     }
 
     @Override
@@ -181,7 +170,7 @@ public class SimpleResponse implements HttpServletResponse {
 
     @Override
     public void flushBuffer() throws IOException {
-        throw new IOException();
+
     }
 
     @Override
